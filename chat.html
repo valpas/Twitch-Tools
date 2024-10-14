@@ -1,0 +1,382 @@
+# badges -> https://badges.twitch.tv/v1/badges/channels/32568625/display
+<html>
+    <head>
+        <title>Twitch Tools</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Gabarito&display=swap" rel="stylesheet">
+        <style>
+            * { padding:0; margin:0; }
+            body { 
+                background: #00000000; 
+                color: #fff; 
+                font-family: 'Madimi one', sans-serif;
+                font-weight: 500;
+            }
+            #wrapper {
+                position: fixed;
+                top: 0;
+                bottom: 0;
+                left: 0;
+                right: 0;
+            }
+            #messages { 
+                list-style: none; 
+                position: absolute;
+                width: 90%;
+                bottom: 0;
+                padding-bottom: 60px;
+            }
+            #messages li { 
+                overflow: hidden;
+                position:relative;
+                bottom: 0;
+                transition: height .4s ease-out;
+            }
+            #messages .message {
+                padding: 1.2rem 0 0;
+            }
+            
+            #messages h2 { 
+                position: absolute; 
+                top: 0.5rem; 
+                line-height: 1;
+                z-index: 10;
+                max-width: 10rem;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                text-transform: uppercase;
+                text-shadow: 1px 1px rgba(0.2,0.2,0.2,1);
+                font-size: 1rem; 
+                padding: .3rem 1rem; 
+                background: #FFF; 
+                border-radius: .6rem;
+            }
+            
+            #messages .shadow {
+                z-index: -1;
+                box-shadow: 0.5rem 0.5rem 0px #666666;
+            }
+            
+            #messages li.even h2 { 
+                left: 0rem;
+            }
+            
+            #messages li.odd h2 {
+                right: 0.5rem;
+            }
+            
+            #messages .same-user h2 {
+                //display: none;
+            }
+            #messages .same-user .message {
+                //padding-top: .7rem;
+            }
+            #messages .content {
+            }
+            #messages span {
+                position: relative;
+                width: 12rem;
+                display: inline-block;
+                margin-right: 0.5rem;
+                margin-bottom: 0.5rem;
+                box-shadow: 0.5rem 0.5rem 0px #666666;
+                background: white;
+                line-height: 1.1;
+                padding: 1.2rem 1rem .8rem; 
+                font-size: 1.3rem; 
+                border-radius: .6rem;
+                border: .2rem solid white;
+                color: #333333;
+            }
+            
+            #messages .content p {
+                overflow-wrap: anywhere;
+            }
+            
+            #messages li.odd span {
+                position: absolute;
+                right: 0;
+            }
+            
+            #messages li.in h2 {
+                animation: username-in .6s ease-out .2s 1 both;
+            }
+            #messages li.out h2 {
+                animation: username-out .6s ease-out .2s 1 both;
+            }
+            #messages li.in .content {
+                animation: message-in .6s ease-out .2s 1 both;
+            }
+            #messages li.out .content {
+                animation: message-out .6s ease-out .2s 1 both;
+            }
+            #messages li.in .emote {
+                animation: emote-in .6s ease-in-out .1s 1 both;
+            }
+            #messages li.out .emote {
+                animation: emote-out .6s ease-in-out .1s 1 both;
+            }
+            #messages .emote {
+                height: 2rem;
+                width: auto;
+                vertical-align: middle;
+                margin: -.5rem 0;
+            }
+            #messages .emote-only .emote {
+                height: 2.6rem;
+                margin: 0;
+            }
+            #messages .emote-only-single h2 {
+                margin-left: 20px;
+            }
+            #messages .emote-only-single .message {
+                margin-left: 20px;
+            }
+            #messages .emote-only-single .emote {
+                height: 4.5rem;
+            }
+            #messages .emotes-jam span {
+                animation: emotes-jam 1s linear infinite both;
+            }
+            #messages .kappa span p {
+                position: relative;
+            }
+            #messages .lul span p {
+                position: relative;
+                animation: waviy 0.5s infinite;
+            }
+
+            #messages .mention {
+                display: inline-block;
+                border-radius: 4px;
+                padding: .1rem .3rem;
+                margin-right: .2rem;
+            }
+
+            #messages .url {
+                color: #889af1;
+            }
+            
+            #counter {
+                background-color: white;
+                color: black;
+                position: absolute;
+                bottom: 0;
+                padding: 0.5rem;
+                border-radius: 2rem;
+                box-shadow: 0.5rem 0.5rem 0px #666666;
+                margin: 1rem;
+            }
+
+            @keyframes message-in {
+                0% { transform: translateX(2rem); opacity:0;}
+                40% { transform: translateX(0px); }
+                100% { opacity:1; }
+            }
+            @keyframes message-out {
+                0% { opacity:1; }
+                40% { transform: translateX(0px); }
+                100% { transform: translateX(2rem); opacity:0;}
+            }
+            @keyframes username-in {
+                0% { transform: scale(.2, .2); opacity:0;}
+                40% { transform: scale(1, 1); }
+                100% { opacity:1; }
+            }
+            @keyframes username-out {
+                0% { opacity:1; }
+                40% { transform: scale(1, 1); }
+                100% { transform: scale(.2, .2); opacity:0;}
+            }
+            @keyframes emote-in {
+                0% { transform: scale(.2, .2); opacity:0;}
+                100% { transform: scale(1, 1); opacity:1; }
+            }
+            @keyframes emote-out {
+                0% { transform: scale(1, 1); opacity:1; }
+                100% { transform: scale(.2, .2); opacity:0;}
+            }
+            @keyframes emotes-jam {
+                0%, 100% { background: linear-gradient(90deg, rgba(164, 0, 0, 0.7) 0%, rgba(164, 0, 0,.1) 100vw); }
+                20% { background: linear-gradient(90deg, rgba(0, 130, 181, 0.7) 0%, rgba(0, 130, 181,.1) 100vw) }
+                40% { background: linear-gradient(90deg, rgba(197, 190, 0, 0.7) 0%, rgba(197, 190, 0,.1) 100vw) }
+                60% { background: linear-gradient(90deg, rgba(25, 164, 0, 0.7) 0%, rgba(25, 164, 0,.1) 100vw) }
+                80% { background: linear-gradient(90deg, rgba(232, 18, 189, 0.7) 0%, rgba(232, 18, 189,.1) 100vw) }
+                0%, 50%, 100% { transform: scale(1, 1);}
+                25%, 75% { transform: scale(.98, .98);}
+            }
+            @keyframes waviy {
+                0%,100% { transform: translateY(3px) }
+                50% { transform: translateY(-3px) }
+            }
+        </style>
+    </head>
+    <body>
+        <div id="wrapper">
+            <ul id="messages">
+    
+            </ul>
+            <span id="counter"></span>
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/comfy.js@latest/dist/comfy.min.js"></script>
+        <script>
+            const CONFIG = {
+                maxMessages: 40,
+                channel: "carpastek"
+            };
+            const TEST_USERS = [
+                "V4lesti",
+                "AtelierSarya",
+                "PhoenixOfFlame1",
+                "Carpastek",
+                "MadMoxxye",
+                "Treux95",
+            ];
+            const TEST_MESSAGE = "Tout savoir sur l'esport Pokémon → https://youtu.be/xTYxrVE1uok. @Prout Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras in odio eget diam elementum ornare non sed purus. Aenean aliquam in lacus sed vestibulum. Donec vehicula ante in tellus volutpat viverra. Morbi nec malesuada quam, vel auctor lacus. Cras in libero feugiat, consequat augue ut, ultrices est. Cras dolor lacus, feugiat eu nunc a, blandit dapibus orci. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Nullam rutrum pharetra egestas."
+            const URL_REGEX = /https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)/g;
+
+            const ulMessages = document.getElementById("messages");
+            const spanCounter = document.getElementById("counter");
+
+            var lastUser = null;
+            var lastUserMessageCount = 0;
+            var isChatFadeOut = false;
+            
+            var countMessages = 0;
+
+            function onChatHandler(user, message, flags, self, extra) {
+                countMessages += 1;
+                spanCounter.innerHTML = countMessages + " messages";
+                
+                console.log(countMessages, user, message);
+
+                // Handle emotes
+                if (extra.messageEmotes) {
+                    // Slice/splice not ideal because it offsets the positions of the emotes
+                    // So we just replace the emote string with an image tag
+                    var emoteReplacements = {};
+                    for (let emote in extra.messageEmotes) {
+                        let emoteUrl = `https://static-cdn.jtvnw.net/emoticons/v2/${emote}/default/dark/3.0`;
+                        // We just need the first position of the emote to get its name
+                        let position = extra.messageEmotes[emote][0];
+                        let start = position.split('-')[0];
+                        let end = parseInt(position.split('-')[1]) + 1;
+                        let emoteString = message.slice(start, end);
+                        emoteReplacements[emoteString] = `<img class="emote" src="${emoteUrl}" />`;
+                    }
+                }
+
+                // Make @mentions bold
+                message = message.replaceAll(/(@[a-zA-Z0-9_-]+)/g, '<strong class="mention">$1</strong>');
+
+                // Replace links
+                message = message.replaceAll(URL_REGEX, match => `<strong class="url">${match}</strong>`);
+                
+                // Very funny message
+                let hasKappa = message.match(/Kappa$/g);
+                let hasLUL = message.match(/LUL$/g);
+                
+                // Only now we replace emote images
+                if (extra.messageEmotes) {
+                    for (let emoteString in emoteReplacements) {
+                        message = message.replaceAll(emoteString, emoteReplacements[emoteString]);
+                    }
+                }
+
+                // Create html li
+                let userColor = extra.userColor || "#f3e8a2";
+                let userSubImage = extra.userBadges;
+                let li = document.createElement("li");
+				let messageId = extra.id
+                li.innerHTML = `<div class="message" id="${messageId}"><h2 style="color:${userColor}">${user}</h2><h2 class="shadow">${user}</h2><div class="content"><span><p>${message}</p></span></div></div>`;
+                
+                // Special cases
+                if(extra.isEmoteOnly) {
+                    li.classList.add("emote-only");
+                    // Emote-only with a single emote makes a different skin
+                    if(Object.keys(extra.messageEmotes).length == 1 && extra.messageEmotes[Object.keys(extra.messageEmotes)[0]].length == 1) {
+                        li.classList.add("emote-only-single");
+                    }
+                    // Emote-only with at least one "JAM" emote makes crazy animation
+                    if(Object.keys(emoteReplacements).some(emoteName => emoteName.match(/JAM/ig))) {
+                        li.classList.add("emotes-jam");
+                    }
+                }
+                // Funny
+                if(hasKappa) {
+                    li.classList.add("kappa");
+                }
+                
+                if(hasLUL) {
+                    li.classList.add("lul");
+                }
+
+                // Last user (to group messages)
+                if(isChatFadeOut == false && lastUser == user && ++lastUserMessageCount < 4) {
+                    li.classList.add("same-user");
+                } else {
+                    lastUserMessageCount = 0;
+                }
+                lastUser = user;
+                
+                // Append li (can depend on emotes)
+                let images = li.querySelectorAll('p img');
+                if(images.length > 0) {
+                    // On load event for emotes
+                    let loadedImages = 0;
+                    images.forEach(img => {
+                        img.onload = () => {
+                            if(++loadedImages >= images.length) {
+                                appendMessage(li);
+                            }
+                        };
+                    });
+                } else {
+                    // Just a timeout for text-only messages
+                    appendMessage(li);
+                }
+            };
+			
+			function onChatMessageDeleted(id, extra) {
+				console.log("Delete message " + id)
+				document.getElementById(id).remove()
+			}
+
+            function appendMessage(li) {
+                // Append
+                ulMessages.append(li);
+
+                // Remove old messages
+                if(ulMessages.children.length > CONFIG.maxMessages) {
+                    ulMessages.children[0].remove();
+                }
+
+                // Setup anim
+                let height = window.getComputedStyle(li).height;
+                li.style.height = "0";
+                window.setTimeout(() => {
+                    li.classList.add("in");
+                    li.style.height = height;
+	  if ((countMessages % 2) == 1) {
+	     li.classList.add("odd");
+	  } else {
+	     li.classList.add("even");
+	  }
+                }, 500);
+                
+                if (isChatFadeOut) {
+                    setTimeout(() => {  li.classList.add("out"); }, 9000);
+                    setTimeout(() => {  ulMessages.children[0].remove(); }, 10000);
+                }
+            }
+
+            // Init
+            ComfyJS.onChat = onChatHandler;
+			ComfyJS.onMessageDeleted = onChatMessageDeleted;
+            ComfyJS.Init(CONFIG.channel);
+            // startTest();
+
+        </script>
+    </body>
+</html>
