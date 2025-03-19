@@ -55,7 +55,7 @@
             
             #messages .shadow {
                 z-index: -1;
-                box-shadow: 0.5rem 0.5rem 0px #666666;
+                box-shadow: 0.5rem 0.5rem 0px #000000;
             }
             
             #messages li.even h2 { 
@@ -80,7 +80,7 @@
                 display: inline-block;
                 margin-right: 0.5rem;
                 margin-bottom: 0.5rem;
-                box-shadow: 0.5rem 0.5rem 0px #666666;
+                box-shadow: 0.5rem 0.5rem 0px #000000;
                 background: white;
                 line-height: 1.1;
                 padding: 1.2rem 1rem .8rem; 
@@ -165,7 +165,7 @@
                 bottom: 0;
                 padding: 0.5rem;
                 border-radius: 2rem;
-                box-shadow: 0.5rem 0.5rem 0px #666666;
+                box-shadow: 0.5rem 0.5rem 0px #000000;
                 margin: 1rem;
             }
 
@@ -288,7 +288,8 @@
                 let userColor = extra.userColor || "#f3e8a2";
                 let userSubImage = extra.userBadges;
                 let li = document.createElement("li");
-                li.innerHTML = `<div class="message"><h2 style="color:${userColor}">${user}</h2><h2 class="shadow">${user}</h2><div class="content"><span><p>${message}</p></span></div></div>`;
+				let messageId = extra.id
+                li.innerHTML = `<div class="message" id="${messageId}" data-a-user="${user}"><h2 style="color:${userColor}">${user}</h2><h2 class="shadow">${user}</h2><div class="content"><span><p>${message}</p></span></div></div>`;
                 
                 // Special cases
                 if(extra.isEmoteOnly) {
@@ -336,6 +337,37 @@
                     appendMessage(li);
                 }
             };
+			
+			function onChatMessageDeleted(id, extra) {
+				console.log("Delete message " + id)
+				if (!isChatFadeOut) {
+					document.getElementById(id).remove()
+				}
+			}
+			
+			function onUserBan(bannedUsername, extra) {
+				deleteAllUserMessages(bannedUsername)
+			}
+			
+			function onUserTimeout(timedOutUsername, durationInSeconds, extra) {
+				deleteAllUserMessages(timedOutUsername)
+			}
+			
+			function deleteAllUserMessages(username) {
+				if (!isChatFadeOut) {
+					console.log("Delete all message of " + username)
+					for (let message of ulMessages.children) {
+						let m = message.children[0]
+						if(m == null) {
+							continue;
+						}
+						if (m.getAttribute('data-a-user') == username) {
+							console.log("Delete message" + m.id)
+							document.getElementById(m.id).remove()
+						}
+					}
+				}
+			}
 
             function appendMessage(li) {
                 // Append
@@ -512,6 +544,9 @@
 
             // Init
             ComfyJS.onChat = onChatHandler;
+			ComfyJS.onMessageDeleted = onChatMessageDeleted;
+			ComfyJS.onBan = onUserBan;
+			ComfyJS.onTimeout = onUserTimeout;
             ComfyJS.Init(CONFIG.channel);
             // startTest();
 
